@@ -12,6 +12,69 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+        <native.maven.plugin.version>0.10.3</native.maven.plugin.version>
+
     </properties>
+    <build>
+        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.gvm.samples.App</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native.maven.plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+
+                        </executions>
+                        <configuration>
+                            <imageName>my-app</imageName>
+                            <verbose>true</verbose>
+                            <!-- For Quick Build (22.1+) -->
+                            <!-- <quickBuild>true</quickBuild> -->
+                            <buildArgs>
+
+                                <buildArg>-Os</buildArg>
+                                <buildArg>--emit build-report</buildArg>
+
+                                <!-- For mostly static native image (only on Linux AMD64 systems) -->
+                                <!-- <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg> -->
+                                <!-- To generate the Native Image build output JSON (22.3+) -->
+                                <!-- <buildArg>-H:BuildOutputJSONFile=build.json</buildArg> -->
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
